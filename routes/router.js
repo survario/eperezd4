@@ -35,17 +35,42 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
     let product = productos[(req.params.id)-1]
-    const respuesta = {}    
+    const respuesta = {} 
+    let producto = {id: req.params.id}   
     if (isNaN(req.params.id)) {
         res.json({ error: 'el parametro no es un numero' })
     } else if (product !== undefined) {
-            respuesta.before = productos[(req.params.id)-1];
-            let producto = {
-                id: (req.params.id), 
-                title: req.body.title, 
-                price: req.body.price,
-                thumbnail: req.body.thumbnail
-            }
+            respuesta.before = productos[(req.params.id)-1];            
+            const promise1 = new Promise((resolve, reject) => {
+                if (req.body.title !== undefined) {
+                    producto.title = req.body.title
+                    return producto
+                } else {
+                    producto.title = product.title
+                    return producto
+                }
+            })
+            const promise2 = new Promise((resolve, reject) => {
+                if (req.body.price !== undefined) {
+                    producto.price = req.body.price
+                    return producto
+                } else {
+                    producto.price = product.price
+                    return producto
+                }
+            })
+            const promise3 = new Promise((resolve, reject) => {
+                if (req.body.thumbnail !== undefined) {
+                    producto.thumbnail = req.body.thumbnail
+                    return producto
+                } else {
+                    producto.thumbnail = product.thumbnail
+                    return producto
+                }
+            })
+            Promise.all([promise1, promise2, promise3]).then(function(producto) {
+                return producto
+            })
             respuesta.update = producto
             productos.splice((req.params.id-1), 1, producto)
             res.send(respuesta)
